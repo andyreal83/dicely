@@ -60,6 +60,20 @@ export const localStore = {
       .sort((a, b) => (b.ended_at ?? "").localeCompare(a.ended_at ?? ""));
   },
 
+  async listActiveGames(): Promise<Game[]> {
+    return loadData()
+      .games.filter((g) => g.status === "active")
+      .sort((a, b) => (b.started_at ?? "").localeCompare(a.started_at ?? ""));
+  },
+
+  async deleteGame(id: string): Promise<void> {
+    const data = loadData();
+    data.games = data.games.filter((g) => g.id !== id);
+    data.players = data.players.filter((p) => p.game_id !== id);
+    data.scores = data.scores.filter((s) => s.game_id !== id);
+    saveData(data);
+  },
+
   async insertPlayers(
     rows: { game_id: string; name: string; position: number }[]
   ): Promise<Player[]> {

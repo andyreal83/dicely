@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { store } from "../lib/store";
 import type { Game, Player, Score } from "../lib/types";
 
 export default function HistoryDetailPage() {
   const { gameId } = useParams<{ gameId: string }>();
+  const navigate = useNavigate();
   const [game, setGame] = useState<Game | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [scores, setScores] = useState<Score[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!gameId) return;
@@ -38,6 +40,13 @@ export default function HistoryDetailPage() {
     counts.set(s.player_id, (counts.get(s.player_id) ?? 0) + 1);
   }
   const ranked = [...players].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0));
+
+  async function deleteGame() {
+    if (!window.confirm(`Delete "${game!.name}"? This can't be undone.`)) return;
+    setDeleting(true);
+    await store.deleteGame(game!.id);
+    navigate("/history");
+  }
 
   return (
     <div>
@@ -70,6 +79,10 @@ export default function HistoryDetailPage() {
           ))}
         </div>
       </div>
+
+      <button className="btn btn-danger" onClick={deleteGame} disabled={deleting}>
+        Delete Game
+      </button>
     </div>
   );
 }

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { store, usingSupabase } from "../lib/store";
 import { uuid } from "../lib/uuid";
 import { useDragReorder } from "../lib/useDragReorder";
 import { DragHandleIcon } from "../components/DragHandle";
+import type { Game } from "../lib/types";
 
 interface DraftPlayer {
   key: string;
@@ -17,6 +18,11 @@ export default function SetupPage() {
   const [playerName, setPlayerName] = useState("");
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeGames, setActiveGames] = useState<Game[]>([]);
+
+  useEffect(() => {
+    store.listActiveGames().then(setActiveGames);
+  }, []);
 
   function addPlayer() {
     const name = playerName.trim();
@@ -73,6 +79,24 @@ export default function SetupPage() {
       {!usingSupabase && (
         <div className="muted" style={{ marginBottom: "1rem" }}>
           Saving to this device only — add Supabase keys to sync across devices.
+        </div>
+      )}
+
+      {activeGames.length > 0 && (
+        <div className="card">
+          <h2>Resume Game</h2>
+          <div className="stack">
+            {activeGames.map((g) => (
+              <Link key={g.id} to={`/game/${g.id}`} style={{ textDecoration: "none" }}>
+                <div className="player-row">
+                  <span className="name">{g.name}</span>
+                  <span className="muted">
+                    {g.started_at ? new Date(g.started_at).toLocaleDateString() : ""}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

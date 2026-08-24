@@ -29,6 +29,21 @@ export const supabaseStore = {
     return data ?? [];
   },
 
+  async listActiveGames(): Promise<Game[]> {
+    const { data, error } = await supabase
+      .from("games")
+      .select("*")
+      .eq("status", "active")
+      .order("started_at", { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async deleteGame(id: string): Promise<void> {
+    const { error } = await supabase.from("games").delete().eq("id", id);
+    if (error) throw error;
+  },
+
   async insertPlayers(
     rows: { game_id: string; name: string; position: number }[]
   ): Promise<Player[]> {

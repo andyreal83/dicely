@@ -197,6 +197,7 @@ export default function GamePage() {
           <div className="row">
             <input
               type="number"
+              inputMode="decimal"
               value={scoreInput}
               onChange={(e) => setScoreInput(e.target.value)}
               onKeyDown={(e) => {
