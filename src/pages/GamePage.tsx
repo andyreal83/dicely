@@ -163,6 +163,7 @@ export default function GamePage() {
   }
 
   if (game.status === "finished") {
+    const ranked = [...players].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0));
     return (
       <div>
         <div className="card winner-banner">
@@ -170,6 +171,22 @@ export default function GamePage() {
           <div className="name">{game.winner_name}</div>
           <div className="muted">wins {game.name} with {game.winner_score} points</div>
         </div>
+
+        <div className="card">
+          <h2>Final Scores</h2>
+          <div className="stack">
+            {ranked.map((p) => (
+              <div className="player-row" key={p.id}>
+                <div>
+                  <div className="name">{p.name}</div>
+                  <div className="meta">{counts.get(p.id) ?? 0} turns</div>
+                </div>
+                <span className="score-tag">{totals.get(p.id) ?? 0}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="stack">
           <button className="btn" onClick={() => navigate("/history")}>
             View History
