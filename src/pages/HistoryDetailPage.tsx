@@ -40,6 +40,9 @@ export default function HistoryDetailPage() {
     counts.set(s.player_id, (counts.get(s.player_id) ?? 0) + 1);
   }
   const ranked = [...players].sort((a, b) => (totals.get(b.id) ?? 0) - (totals.get(a.id) ?? 0));
+  const topScores = [...scores]
+    .sort((a, b) => b.value - a.value || a.created_at.localeCompare(b.created_at))
+    .slice(0, 3);
 
   async function deleteGame() {
     if (!window.confirm(`Delete "${game!.name}"? This can't be undone.`)) return;
@@ -79,6 +82,22 @@ export default function HistoryDetailPage() {
           ))}
         </div>
       </div>
+
+      {topScores.length > 0 && (
+        <div className="card">
+          <h2>Top Scores</h2>
+          <div className="stack">
+            {topScores.map((s) => (
+              <div className="player-row" key={s.id}>
+                <span className="name">
+                  {players.find((p) => p.id === s.player_id)?.name ?? "Unknown"}
+                </span>
+                <span className="score-tag">{s.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <button className="btn btn-danger" onClick={deleteGame} disabled={deleting}>
         Delete Game
